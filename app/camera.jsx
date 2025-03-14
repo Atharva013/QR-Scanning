@@ -13,8 +13,8 @@ const CameraScreen = () => {
 
     if (!permission.granted) {
         return (
-            <View className="flex-1 items-center justify-center">
-                <Text className="text-center pb-3">
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <Text style={{ textAlign: "center", paddingBottom: 10 }}>
                     We need your permission to show the camera
                 </Text>
                 <Button onPress={requestPermission} title="Grant Permission" />
@@ -30,7 +30,7 @@ const CameraScreen = () => {
     };
 
     return (
-        <SafeAreaView className="flex-1">
+        <SafeAreaView style={{ flex: 1 }}>
             <CameraView
                 style={{ flex: 1, width: "100%", height: "100%", backgroundColor: "black" }}
                 ref={cameraRef}
