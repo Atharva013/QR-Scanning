@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Button, Alert } from 'react-native';
 import { Camera } from 'expo-camera';
 
-export default function Scanner() {
+const Scanner = () => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
 
@@ -34,7 +34,9 @@ export default function Scanner() {
       {scanned && <Button title='Scan Again' onPress={() => setScanned(false)} />}
     </View>
   );
-}
+};
+
+export default Scanner;
 
 const styles = StyleSheet.create({
   container: {

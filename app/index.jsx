@@ -3,7 +3,7 @@ import { Link, Stack } from "expo-router";
 
 import { useCameraPermissions } from "expo-camera";
 
-export default function Home() {
+const Home = () => {
   const [permission, requestPermission] = useCameraPermissions();
 
   const isPermissionGranted = Boolean(permission?.granted);
@@ -16,7 +16,7 @@ export default function Home() {
         <Pressable onPress={requestPermission}>
           <Text style={styles.buttonStyle}>Request Permissions</Text>
         </Pressable>
-        <Link href={"/scanner"} asChild>
+        <Link href={"/camera"} asChild>
           <Pressable disabled={!isPermissionGranted}>
             <Text
               style={[
@@ -31,7 +31,9 @@ export default function Home() {
       </View>
     </SafeAreaView>
   );
-}
+};
+
+export default Home;
 
 const styles = StyleSheet.create({
   container: {
