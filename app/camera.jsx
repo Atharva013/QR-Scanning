@@ -1,13 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, Text, TouchableOpacity, SafeAreaView, Animated, Vibration, StyleSheet } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
+import { View, Text, TouchableOpacity, SafeAreaView, Animated, Vibration, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 const CameraScreen = () => {
     const [permission, requestPermission] = useCameraPermissions();
     const [torchOn, setTorchOn] = useState(false);
     const [scannedData, setScannedData] = useState(null);
     const cameraRef = useRef(null);
+    const router = useRouter();
     const scanAnimation = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
@@ -27,14 +29,6 @@ const CameraScreen = () => {
         ).start();
     }, []);
 
-    const handleBarCodeScanned = ({ data }) => {
-        Vibration.vibrate(100);
-        setScannedData(data);
-        console.log("Scanned QR Code:", data);
-    };
-
-    const resetScanner = () => setScannedData(null);
-
     if (!permission) return <View />;
     if (!permission.granted) {
         return (
@@ -47,6 +41,15 @@ const CameraScreen = () => {
         );
     }
 
+    const handleBarCodeScanned = ({ data }) => {
+        Vibration.vibrate(100);
+        setScannedData(data);
+        console.log("Scanned QR Code:", data);
+        router.push(`/MedicineDetails?medicineId=${data}`);
+    };
+
+    const resetScanner = () => setScannedData(null);
+
     return (
         <SafeAreaView style={styles.container}>
             <CameraView
@@ -55,22 +58,16 @@ const CameraScreen = () => {
                 torch={torchOn ? "on" : "off"}
                 onBarcodeScanned={scannedData ? undefined : handleBarCodeScanned}
             >
-                {/* Scanning Overlay */}
                 <View style={styles.overlay}>
                     <View style={styles.scanFrame}>
-                        {/* Animated Scan Line */}
                         <Animated.View
-                            style={[
-                                styles.scanLine,
-                                {
-                                    top: scanAnimation.interpolate({
-                                        inputRange: [0, 1],
-                                        outputRange: [0, 250],
-                                    }),
-                                },
-                            ]}
+                            style={[styles.scanLine, {
+                                top: scanAnimation.interpolate({
+                                    inputRange: [0, 1],
+                                    outputRange: [0, 250],
+                                }),
+                            }]}
                         />
-                        {/* Yellow Corner Brackets */}
                         <View style={[styles.corner, styles.cornerTopLeft]} />
                         <View style={[styles.corner, styles.cornerTopRight]} />
                         <View style={[styles.corner, styles.cornerBottomLeft]} />
@@ -79,7 +76,6 @@ const CameraScreen = () => {
                     <Text style={styles.scanText}>Align the QR code within the frame to scan</Text>
                 </View>
 
-                {/* Flashlight Toggle */}
                 <TouchableOpacity
                     onPress={() => setTorchOn(!torchOn)}
                     style={[styles.flashlightButton, torchOn && styles.flashlightButtonActive]}
@@ -88,7 +84,6 @@ const CameraScreen = () => {
                 </TouchableOpacity>
             </CameraView>
 
-            {/* Display Scanned Data */}
             {scannedData && (
                 <View style={styles.scannedDataContainer}>
                     <Text style={styles.scannedDataText}>Scanned Data: {scannedData}</Text>
@@ -101,7 +96,6 @@ const CameraScreen = () => {
     );
 };
 
-// Styles
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -111,6 +105,27 @@ const styles = StyleSheet.create({
         flex: 1,
         width: "100%",
         height: "100%",
+    },
+    permissionContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 20,
+    },
+    permissionText: {
+        textAlign: "center",
+        paddingBottom: 20,
+        fontSize: 16,
+        color: "#333",
+    },
+    permissionButton: {
+        backgroundColor: "#3498db",
+        padding: 15,
+        borderRadius: 10,
+    },
+    permissionButtonText: {
+        color: "white",
+        fontSize: 16,
     },
     overlay: {
         position: "absolute",
