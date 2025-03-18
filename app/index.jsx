@@ -3,7 +3,7 @@ import { Link, Stack, useRouter } from "expo-router";
 import { useCameraPermissions } from "expo-camera";
 import { useState } from "react";
 import CameraScreen from "./camera"; // Adjust the path if necessary
-import backgroundImage from "../assets/images/otty.jpg"; // Ensure the path is correct
+import backgroundImage from "./new2.jpg"; // Ensure the path is correct
 
 const Home = () => {
     const [permission, requestPermission] = useCameraPermissions();
@@ -22,7 +22,7 @@ const Home = () => {
         <ImageBackground source={backgroundImage} style={styles.backgroundImage}>
             <SafeAreaView style={styles.container}>
                 <Stack.Screen options={{ title: "Overview", headerShown: false }} />
-                <Text style={styles.title}>QR Code Scanner</Text>
+                <Text style={styles.title}>MediTrack Check</Text>
 
                 <View style={styles.buttonContainer}>
                     {!isPermissionGranted ? (
@@ -32,14 +32,14 @@ const Home = () => {
                     ) : (
                         <Link href={"/camera"} asChild>
                             <Pressable style={styles.button}>
-                                <Text style={styles.buttonText}>Scan Code</Text>
+                                <Text style={styles.buttonText}>Scan QR Code</Text>
                             </Pressable>
                         </Link>
                     )}
                 </View>
 
                 {scannedMedicineId && (
-                    <Pressable 
+                    <Pressable
                         onPress={() => router.push({ pathname: "/MedicineDetails", params: { medicineId: scannedMedicineId } })}
                         style={styles.detailsButton}
                     >
@@ -56,7 +56,11 @@ export default Home;
 const styles = StyleSheet.create({
     backgroundImage: {
         flex: 1,
-        resizeMode: "cover",
+        width: "100%",
+        height: "100%",
+        resizeMode: "cover", // Ensures the image covers the entire space while maintaining aspect ratio
+        justifyContent: "center", // Centers content vertically
+        alignItems: "center", // Centers content horizontally
     },
     container: {
         flex: 1,
