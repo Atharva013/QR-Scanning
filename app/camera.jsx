@@ -1,14 +1,14 @@
-import { CameraView, useCameraPermissions } from "expo-camera";
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { View, Text, TouchableOpacity, SafeAreaView, Animated, Vibration, StyleSheet } from "react-native";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import { Ionicons } from "@expo/vector-icons";
 
 const CameraScreen = () => {
     const [permission, requestPermission] = useCameraPermissions();
     const [torchOn, setTorchOn] = useState(false);
-    const [scanAnimation] = useState(new Animated.Value(0));
-    const [scannedData, setScannedData] = useState(null); // State to store scanned data
+    const [scannedData, setScannedData] = useState(null);
     const cameraRef = useRef(null);
+    const scanAnimation = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         Animated.loop(
@@ -27,13 +27,19 @@ const CameraScreen = () => {
         ).start();
     }, []);
 
+    const handleBarCodeScanned = ({ data }) => {
+        Vibration.vibrate(100);
+        setScannedData(data);
+        console.log("Scanned QR Code:", data);
+    };
+
+    const resetScanner = () => setScannedData(null);
+
     if (!permission) return <View />;
     if (!permission.granted) {
         return (
             <View style={styles.permissionContainer}>
-                <Text style={styles.permissionText}>
-                    We need your permission to show the camera
-                </Text>
+                <Text style={styles.permissionText}>We need your permission to show the camera</Text>
                 <TouchableOpacity onPress={requestPermission} style={styles.permissionButton}>
                     <Text style={styles.permissionButtonText}>Grant Permission</Text>
                 </TouchableOpacity>
@@ -41,38 +47,39 @@ const CameraScreen = () => {
         );
     }
 
-    const handleBarCodeScanned = ({ data }) => {
-        Vibration.vibrate(100); // Vibrate on scan
-        setScannedData(data); // Store the scanned data
-        console.log("Scanned QR Code:", data);
-    };
-
-    const resetScanner = () => {
-        setScannedData(null); // Reset the scanned data to allow re-scanning
-    };
-
     return (
         <SafeAreaView style={styles.container}>
             <CameraView
                 style={styles.camera}
                 ref={cameraRef}
-                torch={torchOn ? "on" : "off"} // Use `torch` instead of `torchMode`
-                onBarcodeScanned={scannedData ? undefined : handleBarCodeScanned} // Disable scanning if data is already scanned
+                torch={torchOn ? "on" : "off"}
+                onBarcodeScanned={scannedData ? undefined : handleBarCodeScanned}
             >
                 {/* Scanning Overlay */}
                 <View style={styles.overlay}>
                     <View style={styles.scanFrame}>
-                        <Animated.View style={[styles.scanLine, {
-                            top: scanAnimation.interpolate({
-                                inputRange: [0, 1],
-                                outputRange: [0, 200],
-                            }),
-                        }]} />
+                        {/* Animated Scan Line */}
+                        <Animated.View
+                            style={[
+                                styles.scanLine,
+                                {
+                                    top: scanAnimation.interpolate({
+                                        inputRange: [0, 1],
+                                        outputRange: [0, 250],
+                                    }),
+                                },
+                            ]}
+                        />
+                        {/* Yellow Corner Brackets */}
+                        <View style={[styles.corner, styles.cornerTopLeft]} />
+                        <View style={[styles.corner, styles.cornerTopRight]} />
+                        <View style={[styles.corner, styles.cornerBottomLeft]} />
+                        <View style={[styles.corner, styles.cornerBottomRight]} />
                     </View>
                     <Text style={styles.scanText}>Align the QR code within the frame to scan</Text>
                 </View>
 
-                {/* Flashlight Toggle (Top Right Corner) */}
+                {/* Flashlight Toggle */}
                 <TouchableOpacity
                     onPress={() => setTorchOn(!torchOn)}
                     style={[styles.flashlightButton, torchOn && styles.flashlightButtonActive]}
@@ -94,6 +101,7 @@ const CameraScreen = () => {
     );
 };
 
+// Styles
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -103,27 +111,6 @@ const styles = StyleSheet.create({
         flex: 1,
         width: "100%",
         height: "100%",
-    },
-    permissionContainer: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 20,
-    },
-    permissionText: {
-        textAlign: "center",
-        paddingBottom: 20,
-        fontSize: 16,
-        color: "#333",
-    },
-    permissionButton: {
-        backgroundColor: "#3498db",
-        padding: 15,
-        borderRadius: 10,
-    },
-    permissionButtonText: {
-        color: "white",
-        fontSize: 16,
     },
     overlay: {
         position: "absolute",
@@ -137,18 +124,47 @@ const styles = StyleSheet.create({
     scanFrame: {
         width: 250,
         height: 250,
-        borderWidth: 2,
-        borderColor: "green",
-        borderRadius: 10,
         justifyContent: "center",
         alignItems: "center",
-        overflow: "hidden",
     },
     scanLine: {
         position: "absolute",
         width: "100%",
         height: 2,
-        backgroundColor: "green",
+        backgroundColor: "#FFC107",
+    },
+    corner: {
+        position: "absolute",
+        width: 40,
+        height: 40,
+    },
+    cornerTopLeft: {
+        top: 0,
+        left: 0,
+        borderTopWidth: 4,
+        borderLeftWidth: 4,
+        borderColor: "#FFC107",
+    },
+    cornerTopRight: {
+        top: 0,
+        right: 0,
+        borderTopWidth: 4,
+        borderRightWidth: 4,
+        borderColor: "#FFC107",
+    },
+    cornerBottomLeft: {
+        bottom: 0,
+        left: 0,
+        borderBottomWidth: 4,
+        borderLeftWidth: 4,
+        borderColor: "#FFC107",
+    },
+    cornerBottomRight: {
+        bottom: 0,
+        right: 0,
+        borderBottomWidth: 4,
+        borderRightWidth: 4,
+        borderColor: "#FFC107",
     },
     scanText: {
         marginTop: 20,
