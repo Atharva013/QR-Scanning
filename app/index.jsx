@@ -22,7 +22,7 @@ const Home = () => {
         <ImageBackground source={backgroundImage} style={styles.backgroundImage}>
             <SafeAreaView style={styles.container}>
                 <Stack.Screen options={{ title: "Overview", headerShown: false }} />
-                <Text style={styles.title}>MediTrack Check</Text>
+                <Text style={styles.title}>MediTrack Scan</Text>
 
                 <View style={styles.buttonContainer}>
                     {!isPermissionGranted ? (
